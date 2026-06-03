@@ -4,3 +4,5 @@ Debug/
 Release/
 *.vcxproj.user
 *.dll
+3D Renderer.slnx
+3D Renderer.vcxproj*
