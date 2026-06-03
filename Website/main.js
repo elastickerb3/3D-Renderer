@@ -83,9 +83,7 @@ function Get2DPointsFrom3D(x, y, z, startX, startY, startZ, angleX, angleY, angl
     let transX = x-startX;
     let transY = y-startY;
 
-    let aspectRatio = Width/Height;
-
-    X = (fov * transX) / (depth*aspectRatio) + Width/2;
+    X = (fov * transX) / depth + Width/2;
     Y = (fov * transY) / depth + Height/2;
 
     return [X, Y];
