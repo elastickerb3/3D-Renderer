@@ -15,7 +15,12 @@ int frameTime;
 const int FPS = 60;
 const int FrameDelay = 1000 / FPS;
 
-int Cube_Points[8][3] = {
+int form = 0; // 0 = cube, 1 = pyramid
+std::vector<std::vector<float>> points;
+std::vector<std::vector<int>> edges;
+
+
+std::vector<std::vector<float>> Cube_Points = {
     { 1, 1, 1 },
     { 1, 1, -1},
     { 1, -1, 1},
@@ -26,7 +31,7 @@ int Cube_Points[8][3] = {
     {-1, -1, -1}
 };
 
-int Cube_Edges[12][2] = {
+std::vector<std::vector<int>> Cube_Edges = {
     { 0, 1 },
     { 0, 2 },
     { 0, 3 },
@@ -39,6 +44,25 @@ int Cube_Edges[12][2] = {
     { 4, 7 },
     { 5, 7 },
     { 6, 7 }
+};
+
+std::vector<std::vector<float>> pyramidPoints = {
+    { 0, 1, 0 },
+    { -1, -1, 1 },
+    { 1, -1, 1 },
+    { 1, -1, -1 },
+    { -1, -1, -1 }
+};
+
+std::vector<std::vector<int>> pyramidEdges = {
+    { 0, 1 },
+    { 0, 2 },
+    { 0, 3 },
+    { 0, 4 },
+    { 1, 2 },
+    { 2, 3 },
+    { 3, 4 },
+    { 4, 1 }
 };
 
 std::vector<double> RotatePoint(double x, double y, int degrees) {
@@ -60,6 +84,7 @@ std::vector<double> RotatePoint(double x, double y, int degrees) {
 
 std::vector<int> Get2dPointsFrom3d(double x, double y, double z, float StartX, float StartY, float StartZ, int AngleX, int AngleY, int AngleZ) {
     int X, Y;
+    y = -y;
 
     std::vector<double> RotatedX = RotatePoint(y, z, AngleX);
     y = RotatedX[0]; z = RotatedX[1];
@@ -70,14 +95,14 @@ std::vector<int> Get2dPointsFrom3d(double x, double y, double z, float StartX, f
     std::vector<double> RotatedZ = RotatePoint(x, y, AngleZ);
     x = RotatedZ[0]; y = RotatedZ[1];
 
-    double cameraZ = 3.0 * std::exp(StartZ);
+    double cameraZ = 3.0 * StartZ;
     double depth = cameraZ + z;
     if (depth < 0.1) depth = 0.1;
 
     double transX = x - StartX;
     double transY = y - StartY;
 
-    double fov = 300.0;
+    double fov = 500;
     X = static_cast<int>((transX * fov) / depth) + Width / 2;
     Y = static_cast<int>((transY * fov) / depth) + Height / 2;
 
@@ -111,7 +136,7 @@ int main(int argc, char* argv[]) {
 
     bool running = true;
     SDL_Event e;
-	float posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0;
+	float posX = 0, posY = 0, posZ = 1, rotX = 0, rotY = 0, rotZ = 0;
     while (running) {
 		frameStart = SDL_GetTicks();
 
@@ -148,6 +173,8 @@ int main(int argc, char* argv[]) {
 		if (state[SDL_SCANCODE_RIGHT]) rotY -= 1;
 		if (state[SDL_SCANCODE_Q]) rotZ += 1;
 		if (state[SDL_SCANCODE_E]) rotZ -= 1;
+        if (state[SDL_SCANCODE_1]) form = 0;
+        if (state[SDL_SCANCODE_2]) form = 1;
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -158,11 +185,19 @@ int main(int argc, char* argv[]) {
 
 		int RotationAngle = (SDL_GetTicks() / 10) % 360;
 
-        for (int i = 0; i < 8; i++) {
-            Points.push_back(Get2dPointsFrom3d(Cube_Points[i][0], Cube_Points[i][1], Cube_Points[i][2], posX, posY, posZ, rotX, rotY, rotZ));
+        if (form == 0){
+            points = Cube_Points;
+            edges = Cube_Edges;
+        }else if (form == 1){
+            points = pyramidPoints;
+            edges = pyramidEdges;
         }
-        for (int i = 0; i < 12; i++) {
-			SDL_RenderLine(renderer, (int)Points[Cube_Edges[i][0]][0], (int)Points[Cube_Edges[i][0]][1], (int)Points[Cube_Edges[i][1]][0], (int)Points[Cube_Edges[i][1]][1]);
+
+        for (int i = 0; i < points.size(); i++) {
+            Points.push_back(Get2dPointsFrom3d(points[i][0], points[i][1], points[i][2], posX, posY, posZ, rotX, rotY, rotZ));
+        }
+        for (int i = 0; i < edges.size(); i++) {
+			SDL_RenderLine(renderer, (int)Points[edges[i][0]][0], (int)Points[edges[i][0]][1], (int)Points[edges[i][1]][0], (int)Points[edges[i][1]][1]);
         }
 
         SDL_RenderPresent(renderer);

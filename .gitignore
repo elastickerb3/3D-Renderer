@@ -1,8 +1,4 @@
-.vs/
-x64/
-Debug/
-Release/
-*.vcxproj.user
-*.dll
-3D Renderer.slnx
-3D Renderer.vcxproj.*
+compile.bat
+main.exe
+.vscode/*
+SDL3.dll
