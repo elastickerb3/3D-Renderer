@@ -5,4 +5,4 @@ Release/
 *.vcxproj.user
 *.dll
 3D Renderer.slnx
-3D Renderer.vcxproj*
+3D Renderer.vcxproj.*
