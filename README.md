@@ -26,3 +26,5 @@ Pfeil nach rechts - Drehen (rechts)<br>
 Pfeil nach oben - Vorwährts Drehen <br>
 Q - Drehen (links)<br>
 E - Drehen (rechts)<br>
+1 - Setze Form auf einen Würfel <br>
+2 - Setze Form auf eine Pyramide
